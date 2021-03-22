@@ -58,6 +58,27 @@ if (process.env.HDWALLET_MNEMONIC) {
       mnemonic: process.env.HDWALLET_MNEMONIC
     }
   }
+  networks.oeth = {
+    chainId: 10,
+    url: 'https://mainnet.optimism.io/',
+    accounts: {
+      mnemonic: process.env.HDWALLET_MNEMONIC
+    }
+  }
+  networks.ogor= {
+    chainId: 420,
+    url: 'https://goerli.optimism.io/',
+    accounts: {
+      mnemonic: process.env.HDWALLET_MNEMONIC
+    }
+  }
+  networks.okov = {
+    chainId: 69,
+    url: 'https://kovan.optimism.io/',
+    accounts: {
+      mnemonic: process.env.HDWALLET_MNEMONIC
+    }
+  }
 }
 
 if (process.env.INFURA_API_KEY && process.env.HDWALLET_MNEMONIC) {
