@@ -8,11 +8,13 @@
   },
   "license": "GPL-3.0",
   "scripts": {
-    "reinstall": "rm -rf node_modules/ && rm -f yarn.lock && yarn",
+    "reinstall": "rm -rf node_modules/ && rm -f yarn.lock",
     "verify": "yarn hint && yarn test",
     "hint": "solhint \"contracts/**/*.sol\"",
-    "test": "HIDE_DEPLOY_LOG=true OPTIMIZER_DISABLED=true hardhat test",
-    "compile": "hardhat --show-stack-traces --max-memory 8192 compile",
+    "test:evm": "HIDE_DEPLOY_LOG=true OPTIMIZER_DISABLED=true hardhat test",
+    "test:ovm": "export OVM=true && HIDE_DEPLOY_LOG=true OPTIMIZER_DISABLED=true hardhat test",
+    "compile:evm": "hardhat --show-stack-traces --max-memory 8192 compile",
+    "compile:ovm": "export OVM=true && hardhat --show-stack-traces --max-memory 8192 compile",
     "start": "echo 'Starting node for local testing....\n'; rm -rf deployments/localhost_31337; DISABLE_HARNESS=true hardhat node",
     "start-gas": "echo 'Starting node for gas testing....\n'; rm -rf deployments/localhost_31337; DISABLE_HARNESS=true hardhat node",
     "start-fork": "rm -rf deployments/localhost; cp -r deployments/mainnet deployments/localhost && FORK_ENABLED=true hardhat node --no-reset --no-deploy",
@@ -37,6 +39,7 @@
     "echidna": "yarn echidna:build && docker run -v \"$PWD\":/src pool-contracts/echidna"
   },
   "dependencies": {
+    "@eth-optimism/plugins": "^0.0.20",
     "@openzeppelin/contracts-upgradeable": "3.4.0",
     "@pooltogether/fixed-point": "1.0.0-beta.2",
     "@pooltogether/pooltogether-rng-contracts": "1.0.0",
