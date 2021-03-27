@@ -1,7 +1,7 @@
 const { expect } = require("chai")
-const hardhat = require('hardhat')
+const { ethers, gasLimit } = require('../js/ethers.provider')
 
-let overrides = { gasLimit: 9500000 }
+let overrides = { gasLimit }
 
 describe('StakePrizePoolProxyFactory', () => {
 
@@ -10,10 +10,10 @@ describe('StakePrizePoolProxyFactory', () => {
   let provider
 
   beforeEach(async () => {
-    [wallet] = await hardhat.ethers.getSigners()
-    provider = hardhat.ethers.provider
+    [wallet] = await ethers.getSigners()
+    provider = ethers.provider
    
-    const StakePrizePoolProxyFactory =  await hre.ethers.getContractFactory("StakePrizePoolProxyFactory", wallet, overrides)
+    const StakePrizePoolProxyFactory = await ethers.getContractFactory("StakePrizePoolProxyFactory", wallet, overrides)
     factory = await StakePrizePoolProxyFactory.deploy()
   })
 

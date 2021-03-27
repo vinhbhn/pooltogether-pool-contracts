@@ -1,10 +1,8 @@
-const { ethers } = require('ethers')
 const { expect } = require('chai')
-const hardhat = require('hardhat')
+const { ethers } = require('../js/ethers.provider')
 
 // Vanilla Mocha test. Increased compatibility with tools that integrate Mocha.
 describe('CTokenMock contract', function() {
-
     let token
     let cTokenMock
 
@@ -12,10 +10,10 @@ describe('CTokenMock contract', function() {
     let otherWallet
 
     beforeEach(async () => {
-        [wallet, otherWallet] = await hardhat.ethers.getSigners()
-        const ERC20Mintable = await hre.ethers.getContractFactory("ERC20Mintable", wallet)
+        [wallet, otherWallet] = await ethers.getSigners()
+        const ERC20Mintable = await ethers.getContractFactory("ERC20Mintable", wallet)
         token = await ERC20Mintable.deploy('Test Token', 'TEST')
-        const CTokenMockContract = await hre.ethers.getContractFactory("CTokenMock", wallet)
+        const CTokenMockContract = await ethers.getContractFactory("CTokenMock", wallet)
         cTokenMock = await CTokenMockContract.deploy(token.address, ethers.utils.parseEther('0.01'))
     })
 

@@ -1,24 +1,23 @@
 const { expect } = require('chai')
-const hre = require('hardhat')
+const { ethers, gasLimit } = require('../js/ethers.provider')
+
 const toWei = ethers.utils.parseEther
 
 const debug = require('debug')('ptv3:BalanceDripExposed.test')
 
 describe('BalanceDripExposed', function() {
-
-  const overrides = { gasLimit: 9500000 }
+  const overrides = { gasLimit }
   const unlimitedTokens = toWei('10000')
   let dripExposed
   let wallet, wallet2, wallet3, wallet4
   beforeEach(async () => {
-    [wallet, wallet2, wallet3, wallet4] = await hre.ethers.getSigners()
+    [wallet, wallet2, wallet3, wallet4] = await ethers.getSigners()
     const BalanceDripExposedContract = await ethers.getContractFactory("BalanceDripExposed", wallet, overrides)
     dripExposed = await BalanceDripExposedContract.deploy()
     await dripExposed.setDripRate(toWei('0.1'))
   })
 
   describe('drip()', () => {
-
     it('should handle being initialized', async () => {
       await expect(
         dripExposed.drip(
@@ -112,7 +111,6 @@ describe('BalanceDripExposed', function() {
   })
 
   describe('captureNewTokensForUser()', () => {
-
     it('should retroactively drip to a user', async () => {
       await dripExposed.drip(
         toWei('0'), // total supply of tokens

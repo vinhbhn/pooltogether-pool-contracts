@@ -1,23 +1,21 @@
-const { ethers } = require('ethers')
 const { expect } = require('chai')
-const hardhat = require('hardhat')
+const { ethers, gasLimit } = require('../js/ethers.provider')
 
 const toWei = ethers.utils.parseEther
 
 const debug = require('debug')('ptv3:ExtendedSafeCastExposed.test')
 
-let overrides = { gasLimit: 9500000 }
+let overrides = { gasLimit }
 
 describe('ExtendedSafeCastExposed', function() {
-
   let cast
 
   const MAX_112 = '5192296858534827628530496329220096' // 2**112
   const MAX_96 = '79228162514264337593543950336' // 2**96
 
   beforeEach(async () => {
-    [wallet, wallet2, wallet3, wallet4] = await hardhat.ethers.getSigners()
-    const ExtendedSafeCastExposed = await hre.ethers.getContractFactory("ExtendedSafeCastExposed", wallet, overrides)
+    [wallet, wallet2, wallet3, wallet4] = await ethers.getSigners()
+    const ExtendedSafeCastExposed = await ethers.getContractFactory("ExtendedSafeCastExposed", wallet, overrides)
    
     cast = await ExtendedSafeCastExposed.deploy()
   })
@@ -41,5 +39,4 @@ describe('ExtendedSafeCastExposed', function() {
       await expect(cast.toUint96(MAX_96)).to.be.revertedWith("SafeCast: value doesn't fit in an uint96")
     })
   })
-
 });

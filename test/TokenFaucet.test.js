@@ -1,11 +1,12 @@
 const { expect } = require("chai");
-const hardhat = require('hardhat')
-const { deployContract } = require('ethereum-waffle')
+const { ethers, gasLimit } = require('../js/ethers.provider')
+const hre = require('hardhat')
+const { deployContract } = hre.waffle
 const { AddressZero } = require("ethers").constants
 
 const toWei = ethers.utils.parseEther
 
-const overrides = { gasLimit: 9500000 }
+const overrides = { gasLimit }
 
 const debug = require('debug')('ptv3:TokenFaucet.test')
 
@@ -16,21 +17,19 @@ describe('TokenFaucet', () => {
   let faucet, dripToken, measure
 
   beforeEach(async () => {
-    [wallet, wallet2] = await hardhat.ethers.getSigners()
-    provider = hardhat.ethers.provider
+    [wallet, wallet2] = await ethers.getSigners()
+    provider = ethers.provider
 
 
-    const ERC20MintableContract =  await hre.ethers.getContractFactory("ERC20Mintable", wallet, overrides)
-  
+    const ERC20MintableContract =  await ethers.getContractFactory("ERC20Mintable", wallet, overrides)
 
     measure = await ERC20MintableContract.deploy('Measure', 'MEAS')
-
 
     dripToken = await ERC20MintableContract.deploy('DripToken', 'DRIP')
 
     dripRatePerSecond = ethers.utils.parseEther('0.1')
 
-    const TokenFaucetHarness =  await hre.ethers.getContractFactory("TokenFaucetHarness", wallet, overrides)
+    const TokenFaucetHarness = await ethers.getContractFactory("TokenFaucetHarness", wallet, overrides)
     faucet = await TokenFaucetHarness.deploy()
 
     await expect(faucet.initialize(

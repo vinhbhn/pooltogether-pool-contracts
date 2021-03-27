@@ -1,20 +1,18 @@
 const { expect } = require("chai")
-const hardhat = require('hardhat')
-const { ethers } = hardhat
+const { ethers, gasLimit } = require('../js/ethers.provider')
 
-let overrides = { gasLimit: 9500000 }
+let overrides = { gasLimit }
 
 describe('PeriodicPrizeStrategyListener', () => {
-
   let listener
   let wallet
   let provider
 
   beforeEach(async () => {
-    [wallet] = await hardhat.ethers.getSigners()
-    provider = hardhat.ethers.provider
+    [wallet] = await ethers.getSigners()
+    provider = ethers.provider
    
-    const PeriodicPrizeStrategyListenerFactory =  await hre.ethers.getContractFactory("PeriodicPrizeStrategyListenerStub", wallet, overrides)
+    const PeriodicPrizeStrategyListenerFactory = await ethers.getContractFactory("PeriodicPrizeStrategyListenerStub", wallet, overrides)
     listener = await PeriodicPrizeStrategyListenerFactory.deploy()
     await listener.deployed()
   })

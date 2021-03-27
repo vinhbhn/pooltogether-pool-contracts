@@ -1,23 +1,21 @@
-const { ethers } = require('ethers')
 const { expect } = require('chai')
-const hardhat = require('hardhat')
-const { AddressZero } = require('ethers').constants
+const { ethers, gasLimit } = require('../js/ethers.provider')
+const { AddressZero } = ethers.constants
 
 const toWei = ethers.utils.parseEther
 
 const debug = require('debug')('ptv3:MappedSinglyLinkedListExposed.test')
 
-let overrides = { gasLimit: 9500000 }
+let overrides = { gasLimit }
 
 const SENTINEL = '0x0000000000000000000000000000000000000001'
 
 describe('MappedSinglyLinkedListExposed', function() {
-
   let list
 
   beforeEach(async () => {
-    [wallet, wallet2, wallet3, wallet4] = await hardhat.ethers.getSigners()
-    const MappedSinglyLinkedListExposed = await hre.ethers.getContractFactory("MappedSinglyLinkedListExposed", wallet, overrides)
+    [wallet, wallet2, wallet3, wallet4] = await ethers.getSigners()
+    const MappedSinglyLinkedListExposed = await ethers.getContractFactory("MappedSinglyLinkedListExposed", wallet, overrides)
    
     list = await MappedSinglyLinkedListExposed.deploy()
 

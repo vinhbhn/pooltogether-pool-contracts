@@ -1,17 +1,15 @@
 const { expect } = require("chai");
-const hardhat = require('hardhat')
-
+const { ethers } = require('../js/ethers.provider')
 
 describe('ControlledTokenProxyFactory', () => {
-
   let wallet, wallet2
 
   let provider
 
   beforeEach(async () => {
-    [wallet, wallet2] = await hardhat.ethers.getSigners()
-    provider = hardhat.ethers.provider
-    const ControlledTokenProxyFactory = await hre.ethers.getContractFactory("ControlledTokenProxyFactory", wallet)
+    [wallet, wallet2] = await ethers.getSigners()
+    provider = ethers.provider
+    const ControlledTokenProxyFactory = await ethers.getContractFactory("ControlledTokenProxyFactory", wallet)
     factory = await ControlledTokenProxyFactory.deploy()
   })
 

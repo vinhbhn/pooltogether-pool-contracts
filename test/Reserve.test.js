@@ -1,10 +1,12 @@
 const { expect } = require("chai");
-const hardhat = require('hardhat')
+const hre = require('hardhat')
+const { ethers, gasLimit } = require('../js/ethers.provider')
 
-const { deployMockContract } = require('ethereum-waffle')
-const { AddressZero } = require("ethers").constants
+// const { deployMockContract } = require('ethereum-waffle')
+const { deployMockContract } = hre.waffle
+const { AddressZero } = ethers.constants
 
-const overrides = { gasLimit: 9500000 }
+const overrides = { gasLimit }
 
 const debug = require('debug')('ptv3:Reserve.test')
 
@@ -16,10 +18,9 @@ describe('Reserve', () => {
   let reserve
 
   beforeEach(async () => {
-    [wallet, wallet2] = await hardhat.ethers.getSigners()
-    provider = hardhat.ethers.provider
-    const Reserve =  await hre.ethers.getContractFactory("Reserve", wallet, overrides)
- 
+    [wallet, wallet2] = await ethers.getSigners()
+    provider = ethers.provider
+    const Reserve = await ethers.getContractFactory("Reserve", wallet, overrides)
 
     reserve = await Reserve.deploy()
   })

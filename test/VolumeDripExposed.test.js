@@ -1,7 +1,7 @@
 const { call } = require('./helpers/call')
-const { ethers } = require('ethers')
+const { ethers, gasLimit } = require('../js/ethers.provider')
+
 const { expect } = require('chai')
-const hardhat = require('hardhat')
 
 const toWei = ethers.utils.parseEther
 
@@ -12,15 +12,15 @@ describe('VolumeDripExposed', function() {
 
   let drip
 
-  const overrides = { gasLimit: 9500000 }
+  const overrides = { gasLimit }
   const periodSeconds = 10
   const dripAmount = toWei('10')
   const endTime = 30
   const unlimitedTokens = toWei('10000000')
 
   beforeEach(async () => {
-    [wallet, wallet2, wallet3, wallet4] = await hardhat.ethers.getSigners()
-    const VolumeDripExposed = await hre.ethers.getContractFactory("VolumeDripExposed", wallet, overrides)
+    [wallet, wallet2, wallet3, wallet4] = await ethers.getSigners()
+    const VolumeDripExposed = await ethers.getContractFactory("VolumeDripExposed", wallet, overrides)
     drip = await VolumeDripExposed.deploy()
 
     debug({ drip: drip.address })
