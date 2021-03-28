@@ -1,13 +1,14 @@
 const { expect } = require("chai");
-const hardhat = require('hardhat')
+const hre = require('hardhat')
+const { ethers } = require('../js/ethers.provider')
 const { signPermit } = require('./helpers/signPermit')
 const debug = require('debug')('ptv3:ControlledToken.test.js')
-const { deployMockContract } = require('ethereum-waffle')
+// const { deployMockContract } = require('ethereum-waffle')
+const { deployMockContract } = hre.waffle
 
 const toWei = ethers.utils.parseEther
 
 describe('ControlledToken', () => {
-
   let wallet, wallet2
 
   let provider
@@ -39,14 +40,14 @@ describe('ControlledToken', () => {
   }
 
   beforeEach(async () => {
-    [wallet, wallet2] = await hardhat.ethers.getSigners()
-    provider = hardhat.ethers.provider
+    [wallet, wallet2] = await ethers.getSigners()
+    provider = ethers.provider
     const network = await provider.getNetwork()
     chainId = network.chainId
     const TokenControllerInterface = await hre.artifacts.readArtifact("TokenControllerInterface")
     controller = await deployMockContract(wallet, TokenControllerInterface.abi)
 
-    const ControlledToken =  await hre.ethers.getContractFactory("ControlledToken", wallet)
+    const ControlledToken = await ethers.getContractFactory("ControlledToken", wallet)
     token = await ControlledToken.deploy()
     token2 = token.connect(wallet2)
     await token.initialize(
@@ -122,5 +123,4 @@ describe('ControlledToken', () => {
       await token2.permit(wallet.address, wallet2.address, value, deadline, sig.v, sig.r, sig.s)
     })
   })
-
 })

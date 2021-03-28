@@ -1,4 +1,4 @@
-const ethers = require('ethers')
+const { ethers } = require('./ethers.provider')
 
 function hash(string) {
   return ethers.utils.solidityKeccak256(['string'], [string])

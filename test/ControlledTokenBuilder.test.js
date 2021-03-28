@@ -1,8 +1,9 @@
 const { expect } = require('chai')
 const hre = require('hardhat')
-const { AddressZero } = hre.ethers.constants
-const { deployMockContract } = require('ethereum-waffle')
-
+const { ethers } = require('../js/ethers.provider')
+const { AddressZero } = ethers.constants
+// const { deployMockContract } = require('ethereum-waffle')
+const { deployMockContract } = hre.waffle
 
 const debug = require('debug')('ptv3:ControlledTokenBuilder.test')
 
@@ -16,17 +17,16 @@ describe('ControlledTokenBuilder', () => {
   let controlledTokenConfig
 
   beforeEach(async () => {
-
     await hre.deployments.fixture()
-    wallets  = await hre.ethers.getSigners()
+    wallets = await ethers.getSigners()
 
-    controlledTokenBuilder = await hre.ethers.getContractAt(
+    controlledTokenBuilder = await ethers.getContractAt(
       "ControlledTokenBuilder",
-      (await deployments.get("ControlledTokenBuilder")).address,
+      (await hre.deployments.get("ControlledTokenBuilder")).address,
       wallets[0]
     )
-    controlledTokenProxyFactory = (await deployments.get("ControlledTokenProxyFactory"))
-    ticketProxyFactory = (await deployments.get("TicketProxyFactory"))
+    controlledTokenProxyFactory = (await hre.deployments.get("ControlledTokenProxyFactory"))
+    ticketProxyFactory = (await hre.deployments.get("TicketProxyFactory"))
 
     const TokenControllerInterface = await hre.artifacts.readArtifact("TokenControllerInterface")
     controller = await deployMockContract(wallets[0], TokenControllerInterface.abi)
@@ -47,7 +47,7 @@ describe('ControlledTokenBuilder', () => {
   })
 
   async function getEvents(tx) {
-    let receipt = await hre.ethers.provider.getTransactionReceipt(tx.hash)
+    let receipt = await ethers.provider.getTransactionReceipt(tx.hash)
     return receipt.logs.reduce((parsedEvents, log) => {
       try {
         parsedEvents.push(controlledTokenBuilder.interface.parseLog(log))
@@ -58,12 +58,11 @@ describe('ControlledTokenBuilder', () => {
 
   describe('createControlledToken()', () => {
     it('should create one', async () => {
-
       let tx = await controlledTokenBuilder.createControlledToken(controlledTokenConfig)
       let events = await getEvents(tx)
       let event = events.find(e => e.name == 'CreatedControlledToken')
 
-      const controlledToken = await hre.ethers.getContractAt('ControlledToken', event.args.token, wallets[0])
+      const controlledToken = await ethers.getContractAt('ControlledToken', event.args.token, wallets[0])
       expect(await controlledToken.name()).to.equal(controlledTokenConfig.name)
       expect(await controlledToken.symbol()).to.equal(controlledTokenConfig.symbol)
       expect(await controlledToken.decimals()).to.equal(controlledTokenConfig.decimals)
@@ -73,12 +72,11 @@ describe('ControlledTokenBuilder', () => {
 
   describe('createTicket()', () => {
     it('should create one', async () => {
-
       let tx = await controlledTokenBuilder.createTicket(controlledTokenConfig)
       let events = await getEvents(tx)
       let event = events.find(e => e.name == 'CreatedTicket')
 
-      const ticket = await hre.ethers.getContractAt('Ticket', event.args.token, wallets[0])
+      const ticket = await ethers.getContractAt('Ticket', event.args.token, wallets[0])
       expect(await ticket.name()).to.equal(controlledTokenConfig.name)
       expect(await ticket.symbol()).to.equal(controlledTokenConfig.symbol)
       expect(await ticket.decimals()).to.equal(controlledTokenConfig.decimals)

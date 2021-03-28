@@ -1,25 +1,27 @@
-const { deployMockContract } = require('ethereum-waffle')
+// const { deployMockContract } = require('ethereum-waffle')
 
+const { MockProvider } = require('@eth-optimism/plugins')
 const { expect } = require('chai')
-const hardhat = require('hardhat')
-const { AddressZero } = require('ethers').constants
+const hre = require('hardhat')
+const { deployMockContract } = hre.waffle
+const { ethers, gasLimit } = require('../js/ethers.provider')
+const { AddressZero } = ethers.constants
 
 const debug = require('debug')('ptv3:Ticket.test')
 const toWei = (val) => ethers.utils.parseEther('' + val)
-let overrides = { gasLimit: 9500000 }
+let overrides = { gasLimit }
 
 describe('Ticket', function() {
-
   let ticket
 
   let controller
 
   beforeEach(async () => {
-    [wallet, wallet2, wallet3, wallet4] = await hardhat.ethers.getSigners()
+    [wallet, wallet2, wallet3, wallet4] = await ethers.getSigners()
   
     const TokenControllerInterface = await hre.artifacts.readArtifact("TokenControllerInterface")
-    controller = await deployMockContract(wallet, TokenControllerInterface.abi) 
-    const Ticket = await hre.ethers.getContractFactory("Ticket", wallet, overrides)
+    controller = await deployMockContract(wallet, TokenControllerInterface) 
+    const Ticket = await ethers.getContractFactory("Ticket", wallet, overrides)
     
     ticket = await Ticket.deploy()
 

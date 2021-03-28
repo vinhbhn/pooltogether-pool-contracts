@@ -1,11 +1,14 @@
-const { deployMockContract, deployContract } = require('ethereum-waffle')
+// const { deployMockContract, deployContract } = require('ethereum-waffle')
+const hre = require('hardhat')
+const { deployMockContract } = hre.waffle
+
 const { call } = require('./helpers/call')
 const { deploy1820 } = require('deploy-eip-1820')
 
 
 const { expect } = require('chai')
-const hre = require('hardhat')
-const { AddressZero, One } = require('ethers').constants
+const { ethers, gasLimit } = require('../js/ethers.provider')
+const { AddressZero, One } = ethers.constants
 
 const now = () => (new Date()).getTime() / 1000 | 0
 const toWei = (val) => ethers.utils.parseEther('' + val)
@@ -14,7 +17,7 @@ const debug = require('debug')('ptv3:PeriodicPrizePool.test')
 const SENTINEL = '0x0000000000000000000000000000000000000001'
 const invalidExternalToken = '0x0000000000000000000000000000000000000002'
 
-let overrides = { gasLimit: 9500000 }
+let overrides = { gasLimit }
 
 describe('PeriodicPrizeStrategy', () => {
   let wallet, wallet2
@@ -33,7 +36,7 @@ describe('PeriodicPrizeStrategy', () => {
   let IERC20, TokenListenerInterface, ISablier
 
   beforeEach(async () => {
-    [wallet, wallet2] = await hre.ethers.getSigners()
+    [wallet, wallet2] = await ethers.getSigners()
 
     IERC20 = await hre.artifacts.readArtifact("IERC20Upgradeable")
     ISablier = await hre.artifacts.readArtifact("ISablier")
@@ -91,7 +94,7 @@ describe('PeriodicPrizeStrategy', () => {
     await rng.mock.getRequestFee.returns(rngFeeToken.address, toWei('1'));
 
     debug('deploying prizeStrategy...')
-    const PeriodicPrizeStrategyHarness =  await hre.ethers.getContractFactory("PeriodicPrizeStrategyHarness", wallet, overrides)
+    const PeriodicPrizeStrategyHarness =  await ethers.getContractFactory("PeriodicPrizeStrategyHarness", wallet, overrides)
     prizeStrategy = await PeriodicPrizeStrategyHarness.deploy()
     await prizeStrategy.setDistributor(distributor.address)
 
@@ -121,7 +124,7 @@ describe('PeriodicPrizeStrategy', () => {
   describe('initialize()', () => {
     it('should emit an Initialized event', async () => {
       debug('deploying another prizeStrategy...')
-      const PeriodicPrizeStrategyHarness =  await hre.ethers.getContractFactory("PeriodicPrizeStrategyHarness", wallet, overrides)
+      const PeriodicPrizeStrategyHarness =  await ethers.getContractFactory("PeriodicPrizeStrategyHarness", wallet, overrides)
  
       let prizeStrategy2 = await PeriodicPrizeStrategyHarness.deploy()
       await prizeStrategy2.setDistributor(distributor.address)
@@ -168,7 +171,7 @@ describe('PeriodicPrizeStrategy', () => {
       let initArgs
 
       debug('deploying secondary prizeStrategy...')
-      const PeriodicPrizeStrategyHarness =  await hre.ethers.getContractFactory("PeriodicPrizeStrategyHarness", wallet, overrides)
+      const PeriodicPrizeStrategyHarness =  await ethers.getContractFactory("PeriodicPrizeStrategyHarness", wallet, overrides)
 
       const prizeStrategy2 = await PeriodicPrizeStrategyHarness.deploy()
 
@@ -565,7 +568,7 @@ describe('PeriodicPrizeStrategy', () => {
     let beforeAwardListener
 
     beforeEach(async () => {
-      const beforeAwardListenerStub = await hre.ethers.getContractFactory("BeforeAwardListenerStub")
+      const beforeAwardListenerStub = await ethers.getContractFactory("BeforeAwardListenerStub")
       beforeAwardListener = await beforeAwardListenerStub.deploy()
     })
 
@@ -726,7 +729,7 @@ describe('PeriodicPrizeStrategy', () => {
       prizePeriodStart = 10000
 
       debug('deploying secondary prizeStrategy...')
-      const PeriodicPrizeStrategyHarness =  await hre.ethers.getContractFactory("PeriodicPrizeStrategyHarness", wallet, overrides)
+      const PeriodicPrizeStrategyHarness =  await ethers.getContractFactory("PeriodicPrizeStrategyHarness", wallet, overrides)
 
       prizeStrategy2 = await PeriodicPrizeStrategyHarness.deploy()
 

@@ -1,16 +1,16 @@
 const chalk = require('chalk')
 const hardhat = require('hardhat')
+const { ethers } = require('../../js/ethers.provider')
 
 const { getNamedAccounts } = hardhat
 
 async function run() {
   console.log(chalk.dim(`Gathering funds from Binance....`))
-  const { ethers } = hardhat
   const { provider, getContractAt } = ethers
   const { deployer } = await getNamedAccounts()
   
-  const binance = await provider.getUncheckedSigner('0x564286362092D8e7936f0549571a803B203aAceD')
-  const binance7 = await provider.getUncheckedSigner('0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8')
+  const binance = provider.getUncheckedSigner('0x564286362092D8e7936f0549571a803B203aAceD')
+  const binance7 = provider.getUncheckedSigner('0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8')
   const dai = await getContractAt('Dai', '0x6b175474e89094c44da98b954eedeac495271d0f', binance)
   const usdc = await getContractAt('Dai', '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', binance7)
 

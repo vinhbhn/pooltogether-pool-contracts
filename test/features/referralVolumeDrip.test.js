@@ -1,8 +1,7 @@
 const { PoolEnv } = require('./support/PoolEnv')
-const ethers = require('ethers')
+const ethers = require('../../js/ethers.provider')
 
 describe('Referral volume drip', () => {
-
   let env
 
   beforeEach(() => {

@@ -1,16 +1,17 @@
-const { deployMockContract } = require('ethereum-waffle')
+// const { deployMockContract } = require('ethereum-waffle')
 const { deploy1820 } = require('deploy-eip-1820')
 
-
 const { expect } = require('chai')
-const hardhat = require('hardhat')
-const { AddressZero, Zero, One } = require('ethers').constants
+const hre = require('hardhat')
+const { deployMockContract } = hre.waffle
+const { ethers, gasLimit } = require('../js/ethers.provider')
+const { AddressZero, Zero, One } = ethers.constants
 
 const now = () => (new Date()).getTime() / 1000 | 0
 const toWei = (val) => ethers.utils.parseEther('' + val)
 const debug = require('debug')('ptv3:PeriodicPrizePool.test')
 
-let overrides = { gasLimit: 9500000 }
+let overrides = { gasLimit }
 
 describe('MultipleWinners', function() {
   let wallet, wallet2, wallet3, wallet4
@@ -25,7 +26,7 @@ describe('MultipleWinners', function() {
   let prizePeriodSeconds = 1000
 
   beforeEach(async () => {
-    [wallet, wallet2, wallet3, wallet4] = await hardhat.ethers.getSigners()
+    [wallet, wallet2, wallet3, wallet4] = await ethers.getSigners()
 
     debug({
       wallet: wallet.address,
@@ -66,7 +67,7 @@ describe('MultipleWinners', function() {
     await rng.mock.getRequestFee.returns(rngFeeToken.address, toWei('1'));
 
     debug('deploying prizeStrategy...')
-    const MultipleWinnersHarness =  await hre.ethers.getContractFactory("MultipleWinnersHarness", wallet, overrides)
+    const MultipleWinnersHarness =  await ethers.getContractFactory("MultipleWinnersHarness", wallet, overrides)
   
     prizeStrategy = await MultipleWinnersHarness.deploy()
 
@@ -91,10 +92,9 @@ describe('MultipleWinners', function() {
   })
 
   describe('initializeMultipleWinners()', () => {
-
     it('should emit event when initialized', async()=>{
       debug('deploying another prizeStrategy...')
-      const MultipleWinnersHarness =  await hre.ethers.getContractFactory("MultipleWinnersHarness", wallet, overrides)
+      const MultipleWinnersHarness = await ethers.getContractFactory("MultipleWinnersHarness", wallet, overrides)
   
       let prizeStrategy2 = await MultipleWinnersHarness.deploy()
       initalizeResult2 = prizeStrategy2.initializeMultipleWinners(
@@ -108,7 +108,6 @@ describe('MultipleWinners', function() {
 
       await expect(initalizeResult2).to.emit(prizeStrategy2, 'NumberOfWinnersSet').withArgs(4)
     })
-
 
     it('should set the params', async () => {
       expect(await prizeStrategy.prizePool()).to.equal(prizePool.address)
@@ -145,7 +144,7 @@ describe('MultipleWinners', function() {
   describe('distribute()', () => {
     it('should ignore awarding prizes if there are no winners to select', async () => {
       await prizePool.mock.captureAwardBalance.returns(toWei('10'))
-      await ticket.mock.draw.withArgs(10).returns(ethers.constants.AddressZero)
+      await ticket.mock.draw.withArgs(10).returns(AddressZero)
       await expect(prizeStrategy.distribute(10))
         .to.emit(prizeStrategy, 'NoWinners')
     })
@@ -175,7 +174,7 @@ describe('MultipleWinners', function() {
         controller = await deployMockContract(wallet, TokenControllerInterface.abi, overrides)
         await controller.mock.beforeTokenTransfer.returns()
 
-        const Ticket =  await hre.ethers.getContractFactory("Ticket", wallet, overrides)
+        const Ticket =  await ethers.getContractFactory("Ticket", wallet, overrides)
         
         ticket = await Ticket.deploy()
         await ticket.initialize("NAME", "SYMBOL", 8, controller.address)
@@ -183,7 +182,7 @@ describe('MultipleWinners', function() {
         await controller.call(ticket, 'controllerMint', wallet.address, toWei('100'))
         await controller.call(ticket, 'controllerMint', wallet2.address, toWei('100'))
 
-        const MultipleWinnersHarness =  await hre.ethers.getContractFactory("MultipleWinnersHarness", wallet, overrides)
+        const MultipleWinnersHarness =  await ethers.getContractFactory("MultipleWinnersHarness", wallet, overrides)
 
         prizeStrategy = await MultipleWinnersHarness.deploy()
         debug('initializing prizeStrategy 2...')
@@ -260,7 +259,6 @@ describe('MultipleWinners', function() {
           await prizeStrategy.setNumberOfWinners(3)
           await prizeStrategy.distribute(90) // this hashes out to the same winner twice
         })
-
       })
     })
   })

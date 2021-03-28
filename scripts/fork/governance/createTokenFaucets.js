@@ -1,6 +1,7 @@
-const hardhat = require('hardhat')
+const { deployments } = require('hardhat')
+const { ethers } = require('../../../js/ethers.provider')
 const chalk = require("chalk")
-const {increaseTime} = require('../../../test/helpers/increaseTime')
+const { increaseTime } = require('../../../test/helpers/increaseTime')
 
 function dim() {
   console.log(chalk.dim.call(chalk, ...arguments))
@@ -10,11 +11,9 @@ function green() {
   console.log(chalk.green.call(chalk, ...arguments))
 }
 
-const { ethers, deployments } = hardhat
-
 async function getProxy(tx) { 
   const tokenFaucetProxyFactoryDeployment = await deployments.get('TokenFaucetProxyFactory')
-  const gnosisSafe = await ethers.provider.getUncheckedSigner('0x029Aa20Dcc15c022b1b61D420aaCf7f179A9C73f')
+  const gnosisSafe = ethers.provider.getUncheckedSigner('0x029Aa20Dcc15c022b1b61D420aaCf7f179A9C73f')
   const tokenFaucetProxyFactory = await ethers.getContractAt('TokenFaucetProxyFactory', tokenFaucetProxyFactoryDeployment.address, gnosisSafe)
   const createResultReceipt = await ethers.provider.getTransactionReceipt(tx.hash)
   const createResultEvents = createResultReceipt.logs.map(log => { try { return tokenFaucetProxyFactory.interface.parseLog(log) } catch (e) { return null } })
@@ -30,7 +29,7 @@ async function run() {
   dim(`token faucet ${tokenFaucetProxyFactoryDeployment.address}`)
   dim(`pool address ${pool}`)
   
-  const gnosisSafe = await ethers.provider.getUncheckedSigner('0x029Aa20Dcc15c022b1b61D420aaCf7f179A9C73f')
+  const gnosisSafe = ethers.provider.getUncheckedSigner('0x029Aa20Dcc15c022b1b61D420aaCf7f179A9C73f')
   const tokenFaucetProxyFactory = await ethers.getContractAt('TokenFaucetProxyFactory', tokenFaucetProxyFactoryDeployment.address, gnosisSafe)
 
   const poolToken = await ethers.getContractAt('IERC20Upgradeable', pool, gnosisSafe)

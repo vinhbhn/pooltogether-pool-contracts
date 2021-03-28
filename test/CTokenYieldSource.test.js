@@ -1,9 +1,10 @@
-const { deployMockContract } = require('ethereum-waffle')
 const { expect } = require('chai')
-const hardhat = require('hardhat')
+const hre = require('hardhat')
+const { ethers } = require('../js/ethers.provider')
+// const { deployMockContract } = require('ethereum-waffle')
+const { deployMockContract } = hre.waffle
 
 describe('CTokenYieldSource', function() {
-
   let cToken
   let cTokenYieldSource
 
@@ -11,12 +12,12 @@ describe('CTokenYieldSource', function() {
   let otherWallet
 
   beforeEach(async () => {
-    [wallet, otherWallet] = await hardhat.ethers.getSigners()
+    [wallet, otherWallet] = await ethers.getSigners()
 
     const CTokenInterfaceArtifact = await hre.artifacts.readArtifact('CTokenInterface')        
     cToken = await deployMockContract(wallet, CTokenInterfaceArtifact.abi)
     
-    const CTokenYieldSourceFactory = await hre.ethers.getContractFactory("CTokenYieldSource", wallet)
+    const CTokenYieldSourceFactory = await ethers.getContractFactory("CTokenYieldSource", wallet)
     cTokenYieldSource = await CTokenYieldSourceFactory.deploy(cToken.address)
   })
 

@@ -1,15 +1,15 @@
-const { deployMockContract } = require('ethereum-waffle')
+// const { deployMockContract } = require('ethereum-waffle')
 
-
-const { ethers } = require('ethers')
 const { expect } = require('chai')
-const hardhat = require('hardhat')
+const hre = require('hardhat')
+const { deployMockContract } = hre.waffle 
+const { ethers, gasLimit } = require('../js/ethers.provider')
 
 const toWei = ethers.utils.parseEther
 
 const debug = require('debug')('ptv3:yVaultPrizePool.test')
 
-let overrides = { gasLimit: 9500000 }
+let overrides = { gasLimit }
 
 describe('yVaultPrizePool', function() {
   let wallet, wallet2
@@ -24,16 +24,16 @@ describe('yVaultPrizePool', function() {
   let initializeTxPromise
 
   beforeEach(async () => {
-    [wallet, wallet2] = await hardhat.ethers.getSigners()
+    [wallet, wallet2] = await ethers.getSigners()
     debug(`using wallet ${wallet.address}`)
 
     debug('creating token...')
-    const ERC20MintableContract =  await hre.ethers.getContractFactory("ERC20Mintable", wallet, overrides)
+    const ERC20MintableContract = await ethers.getContractFactory("ERC20Mintable", wallet, overrides)
  
     erc20token = await ERC20MintableContract.deploy("Token", "TOKE")
 
     debug('creating vault...')
-    const yVaultMock =  await hre.ethers.getContractFactory("yVaultMock", wallet, overrides)
+    const yVaultMock = await ethers.getContractFactory("yVaultMock", wallet, overrides)
     vault = await yVaultMock.deploy(erc20token.address)
 
     const TokenListenerInterface = await hre.artifacts.readArtifact("TokenListenerInterface")
@@ -45,7 +45,7 @@ describe('yVaultPrizePool', function() {
     comptroller = await deployMockContract(wallet, TokenListenerInterface.abi, overrides)
 
     debug('deploying yVaultPrizePoolHarness...')
-    const yVaultPrizePoolHarness =  await hre.ethers.getContractFactory("yVaultPrizePoolHarness", wallet, overrides)
+    const yVaultPrizePoolHarness = await ethers.getContractFactory("yVaultPrizePoolHarness", wallet, overrides)
     prizePool = await yVaultPrizePoolHarness.deploy()
 
     const ControlledToken = await hre.artifacts.readArtifact("ControlledToken")

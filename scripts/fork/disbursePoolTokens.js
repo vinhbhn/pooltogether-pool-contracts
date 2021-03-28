@@ -1,4 +1,5 @@
 const hardhat = require('hardhat')
+const { ethers } = require('../../js/ethers.provider')
 const chalk = require("chalk")
 
 function dim() {
@@ -9,11 +10,11 @@ function green() {
   console.log(chalk.green.call(chalk, ...arguments))
 }
 
-const { ethers, deployments, getNamedAccounts } = hardhat
+const { deployments, getNamedAccounts } = hardhat
 
 async function run() {
   const { pool } = await getNamedAccounts()
-  const gnosisSafe = await ethers.provider.getUncheckedSigner('0x029Aa20Dcc15c022b1b61D420aaCf7f179A9C73f')
+  const gnosisSafe = ethers.provider.getUncheckedSigner('0x029Aa20Dcc15c022b1b61D420aaCf7f179A9C73f')
   const poolToken = await ethers.getContractAt('IERC20Upgradeable', pool, gnosisSafe)
 
   dim(`Disbursing to treasury...`)

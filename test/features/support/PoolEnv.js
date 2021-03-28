@@ -1,7 +1,6 @@
 // features/support/world.js
 const chalk = require('chalk')
-const hardhat = require("hardhat")
-const ethers = require('ethers')
+const {ethers, gasLimit} = require('../../../js/ethers.provider')
 
 const { expect } = require('chai')
 const { call } = require('../../helpers/call')
@@ -14,9 +13,13 @@ const debug = require('debug')('ptv3:PoolEnv')
 const toWei = (val) => ethers.utils.parseEther('' + val)
 const fromWei = (val) => ethers.utils.formatEther('' + val)
 
+const overrides = {
+  gasLimit
+}
+
 function PoolEnv() {
 
-  this.overrides = { gasLimit: 9500000 }
+  this.overrides = overrides
 
   this.createPool = async function ({
     prizePeriodStart = 0,
@@ -28,7 +31,7 @@ function PoolEnv() {
     externalERC20Awards = [],
     poolType
   }) {
-    this.wallets = await hardhat.ethers.getSigners()
+    this.wallets = await ethers.getSigners()
 
     debug({
       wallet0: this.wallets[0].address,
@@ -60,8 +63,8 @@ function PoolEnv() {
     const externalAwardAddresses = []
     this.externalERC20Awards = {}
 
-    const ERC20Mintable = await hre.ethers.getContractFactory("ERC20Mintable", this.wallets[0], this.overrides)
-    const ERC721Mintable = await hre.ethers.getContractFactory("ERC721Mintable", this.wallets[0], this.overrides)
+    const ERC20Mintable = await ethers.getContractFactory("ERC20Mintable", this.wallets[0], this.overrides)
+    const ERC721Mintable = await ethers.getContractFactory("ERC721Mintable", this.wallets[0], this.overrides)
 
 
     for (var i = 0; i < externalERC20Awards.length; i++) {
@@ -100,7 +103,7 @@ function PoolEnv() {
   }
 
   this.prizeStrategy = async function (wallet) {
-    let prizeStrategy = await hardhat.ethers.getContractAt('MultipleWinnersHarness', this.env.prizeStrategy.address, wallet)
+    let prizeStrategy = await ethers.getContractAt('MultipleWinnersHarness', this.env.prizeStrategy.address, wallet)
     this._prizeStrategy = prizeStrategy
     return prizeStrategy
   }
@@ -126,13 +129,13 @@ function PoolEnv() {
   this.ticket = async function (wallet) {
     let prizeStrategy = await this.prizeStrategy(wallet)
     let ticketAddress = await prizeStrategy.ticket()
-    return await hardhat.ethers.getContractAt('ControlledToken', ticketAddress, wallet)
+    return await ethers.getContractAt('ControlledToken', ticketAddress, wallet)
   }
 
   this.sponsorship = async function (wallet) {
     let prizePool = await this.prizeStrategy(wallet)
     let sponsorshipAddress = await prizePool.sponsorship()
-    return await hardhat.ethers.getContractAt('ControlledToken', sponsorshipAddress, wallet)
+    return await ethers.getContractAt('ControlledToken', sponsorshipAddress, wallet)
   }
 
   this.wallet = async function (id) {

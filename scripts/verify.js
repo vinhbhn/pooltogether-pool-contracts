@@ -2,20 +2,20 @@
 const chalk = require('chalk')
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
-const hardhat = require('hardhat')
+const { deployments } = require('hardhat')
+const { ethers } = require('../js/ethers.provider')
 
 const info = (msg) => console.log(chalk.dim(msg))
 const success = (msg) => console.log(chalk.green(msg))
 const error = (msg) => console.error(chalk.red(msg))
 
 const getContract = async (name) => {
-  const { deployments } = hardhat
-  const signers = await hardhat.ethers.getSigners()
-  return hardhat.ethers.getContractAt(name, (await deployments.get(name)).address, signers[0])
+  const signers = await ethers.getSigners()
+  return ethers.getContractAt(name, (await deployments.get(name)).address, signers[0])
 }
 
 const verifyAddress = async (address, name, options = "") => {
-  const network = await hardhat.ethers.provider.getNetwork()
+  const network = await ethers.provider.getNetwork()
   try {
     await exec(`hardhat ${options} verify --network ${network.name === 'homestead' ? 'mainnet' : network.name} ${address}`)
   } catch (e) {
@@ -44,7 +44,7 @@ const verifyContract = async (name, options = "") => {
 }
 
 async function run() {
-  const network = await hardhat.ethers.provider.getNetwork()
+  const network = await ethers.provider.getNetwork()
 
   info(`Verifying top-level contracts...`)
   const { stdout, stderr } = await exec(

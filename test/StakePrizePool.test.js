@@ -1,14 +1,15 @@
-const { deployMockContract } = require('ethereum-waffle')
+// const { deployMockContract } = require('ethereum-waffle')
 
-const { ethers } = require('ethers')
 const { expect } = require('chai')
-const hardhat = require('hardhat')
+const hre = require('hardhat')
+const { deployMockContract } = hre.waffle
+const { ethers, gasLimit } = require('../js/ethers.provider')
 
 const toWei = ethers.utils.parseEther
 
 const debug = require('debug')('ptv3:PrizePool.test')
 
-let overrides = { gasLimit: 9500000 }
+let overrides = { gasLimit }
 
 describe('StakePrizePool', function() {
   let wallet, wallet2
@@ -23,7 +24,7 @@ describe('StakePrizePool', function() {
   let initializeTxPromise
 
   beforeEach(async () => {
-    [wallet, wallet2] = await hardhat.ethers.getSigners()
+    [wallet, wallet2] = await ethers.getSigners()
     debug(`using wallet ${wallet.address}`)
 
     debug('mocking tokens...')
@@ -47,7 +48,7 @@ describe('StakePrizePool', function() {
     registry = await deployMockContract(wallet, RegistryInterface.abi, overrides)
 
     debug('deploying StakePrizePoolHarness...')
-    const StakePrizePoolHarness = await hre.ethers.getContractFactory("StakePrizePoolHarness", wallet, overrides)
+    const StakePrizePoolHarness = await ethers.getContractFactory("StakePrizePoolHarness", wallet, overrides)
   
     prizePool = await StakePrizePoolHarness.deploy()
 

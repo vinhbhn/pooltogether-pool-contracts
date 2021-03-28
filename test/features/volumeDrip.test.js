@@ -3,7 +3,6 @@ const { PoolEnv } = require('./support/PoolEnv')
 const debug = require('debug')('ptv3:volumeDrip.test')
 
 describe('Volume drip', () => {
-
   let env
 
   beforeEach(() => {

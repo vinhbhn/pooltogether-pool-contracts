@@ -1,14 +1,15 @@
-const { deployMockContract } = require('ethereum-waffle')
+// const { deployMockContract } = require('ethereum-waffle')
 
-const { ethers } = require('ethers')
 const { expect } = require('chai')
-const hardhat = require('hardhat')
+const hre = require('hardhat')
+const { deployMockContract } = hre.waffle
+const { ethers, gasLimit } = require('../js/ethers.provider')
 
 const toWei = ethers.utils.parseEther
 
 const debug = require('debug')('ptv3:PrizePool.test')
 
-let overrides = { gasLimit: 9500000 }
+let overrides = { gasLimit }
 
 describe('CompoundPrizePool', function() {
   let wallet, wallet2
@@ -23,7 +24,7 @@ describe('CompoundPrizePool', function() {
   let initializeTxPromise
 
   beforeEach(async () => {
-    [wallet, wallet2] = await hardhat.ethers.getSigners()
+    [wallet, wallet2] = await ethers.getSigners()
     debug(`using wallet ${wallet.address}`)
     debug('mocking tokens...')
     const IERC20 = await hre.artifacts.readArtifact("IERC20Upgradeable")
@@ -46,7 +47,7 @@ describe('CompoundPrizePool', function() {
     registry = await deployMockContract(wallet, RegistryInterface.abi, overrides)
 
     debug('deploying CompoundPrizePoolHarness...')
-    const CompoundPrizePoolHarness = await hre.ethers.getContractFactory("CompoundPrizePoolHarness", wallet, overrides)
+    const CompoundPrizePoolHarness = await ethers.getContractFactory("CompoundPrizePoolHarness", wallet, overrides)
     prizePool = await CompoundPrizePoolHarness.deploy()
 
     const ControlledToken = await hre.artifacts.readArtifact("ControlledToken")

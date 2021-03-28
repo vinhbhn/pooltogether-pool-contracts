@@ -1,4 +1,5 @@
 const hardhat = require('hardhat')
+const { ethers } = require('../../js/ethers.provider')
 const chalk = require("chalk")
 const { increaseTime } = require('../test/helpers/increaseTime')
 
@@ -11,10 +12,8 @@ function yellow() {
 }
 
 async function run() {
-  const { ethers } = hardhat
-  const { provider } = ethers
 
-  const gnosisSafe = await ethers.provider.getUncheckedSigner('0x029Aa20Dcc15c022b1b61D420aaCf7f179A9C73f')
+  const gnosisSafe = ethers.provider.getUncheckedSigner('0x029Aa20Dcc15c022b1b61D420aaCf7f179A9C73f')
   const prizePool = await ethers.getContractAt('CompoundPrizePool', '0xEBfb47A7ad0FD6e57323C8A42B2E5A6a4F68fc1a', gnosisSafe)
 
   const prizeStrategy = await ethers.getContractAt('PeriodicPrizeStrategy', await prizePool.prizeStrategy(), gnosisSafe)
@@ -39,7 +38,7 @@ async function run() {
   if (await prizeStrategy.canCompleteAward()) {
     dim(`Completing award (will probably fail the first time on a fresh fork)....`)
     const completeAwardTx = await prizeStrategy.completeAward()
-    const completeAwardReceipt = await provider.getTransactionReceipt(completeAwardTx.hash)
+    const completeAwardReceipt = await ethers.provider.getTransactionReceipt(completeAwardTx.hash)
     const completeAwardEvents = completeAwardReceipt.logs.reduce((array, log) => { try { array.push(prizePool.interface.parseLog(log)) } catch (e) {} return array }, [])
     const awardedEvents = completeAwardEvents.filter(event => event.name === 'Awarded')
     const awardedExternalERC721Events = completeAwardEvents.filter(event => event.name === 'AwardedExternalERC721')

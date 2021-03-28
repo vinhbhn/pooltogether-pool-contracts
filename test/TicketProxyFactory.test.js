@@ -1,8 +1,11 @@
 const { expect } = require("chai");
-const hardhat = require('hardhat')
-const {  deployMockContract } = require('ethereum-waffle')
+const hre = require('hardhat')
+const { ethers, gasLimit } = require('../js/ethers.provider')
 
-let overrides = { gasLimit: 9500000 }
+// const {  deployMockContract } = require('ethereum-waffle')
+const {  deployMockContract } = hre.waffle
+
+let overrides = { gasLimit }
 
 describe('TicketProxyFactory', () => {
 
@@ -13,10 +16,10 @@ describe('TicketProxyFactory', () => {
   let provider
 
   beforeEach(async () => {
-    [wallet, wallet2] = await hardhat.ethers.getSigners()
-    provider = hardhat.ethers.provider
+    [wallet, wallet2] = await ethers.getSigners()
+    provider = ethers.provider
 
-    const TicketProxyFactory = await hre.ethers.getContractFactory("TicketProxyFactory", wallet, overrides)
+    const TicketProxyFactory = await ethers.getContractFactory("TicketProxyFactory", wallet, overrides)
     factory = await TicketProxyFactory.deploy()
 
     const TokenControllerInterface = await hre.artifacts.readArtifact("TokenControllerInterface")
@@ -30,7 +33,7 @@ describe('TicketProxyFactory', () => {
       let event = factory.interface.parseLog(receipt.logs[0])
       expect(event.name).to.equal('ProxyCreated')
 
-      const ticket = await hardhat.ethers.getContractAt("Ticket", event.args.proxy, wallet)
+      const ticket = await ethers.getContractAt("Ticket", event.args.proxy, wallet)
 
       await ticket.initialize(
         "NAME",

@@ -1,8 +1,9 @@
 const hardhat = require('hardhat')
+const { ethers } = require('../js/ethers.provider')
 const fs = require('fs')
 
 async function run() {
-  const { deployments, ethers } = hardhat
+  const { deployments } = hardhat
   const { provider } = ethers
 
   const signers = await ethers.getSigners()
@@ -12,7 +13,6 @@ async function run() {
   const filter = ticket.filters.Transfer()
 
   filter.fromBlock = 11104392
-
 
   const logs = await provider.getLogs(filter)
 

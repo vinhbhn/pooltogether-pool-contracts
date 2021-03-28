@@ -1,4 +1,4 @@
-const ethers = require('ethers')
+const { ethers } = require('../../js/ethers.provider')
 
 const domainSchema = [
     { name: "name", type: "string" },

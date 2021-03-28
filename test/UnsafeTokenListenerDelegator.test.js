@@ -1,9 +1,12 @@
 const { expect } = require("chai")
 
-const hardhat = require('hardhat')
-const { deployMockContract } = require('ethereum-waffle')
+const hre = require('hardhat')
+const { ethers, gasLimit } = require('../js/ethers.provider')
 
-let overrides = { gasLimit: 9500000 }
+// const { deployMockContract } = require('ethereum-waffle')
+const { deployMockContract } = hre.waffle
+
+let overrides = { gasLimit }
 
 describe('UnsafeTokenListenerDelegator', () => {
 
@@ -14,11 +17,11 @@ describe('UnsafeTokenListenerDelegator', () => {
   let listener, delegator
 
   beforeEach(async () => {
-    [wallet, wallet2, wallet3] = await hardhat.ethers.getSigners()
-    provider = hardhat.ethers.provider
+    [wallet, wallet2, wallet3] = await ethers.getSigners()
+    provider = ethers.provider
     
     await deployments.fixture()
-    factory = await hardhat.ethers.getContractAt(
+    factory = await ethers.getContractAt(
       "UnsafeTokenListenerDelegatorProxyFactory",
       (await deployments.get("UnsafeTokenListenerDelegatorProxyFactory")).address,
       wallet

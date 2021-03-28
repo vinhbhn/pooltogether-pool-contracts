@@ -1,9 +1,11 @@
-const { deployMockContract } = require('ethereum-waffle')
+// const { deployMockContract } = require('ethereum-waffle')
 
 
-const { ethers } = require('ethers')
 const { expect } = require('chai')
-const hardhat = require('hardhat')
+const hre = require('hardhat')
+const { deployMockContract } = hre.waffle
+const { ethers, gasLimit } = require('../js/ethers.provider')
+
 const { AddressZero } = require('ethers').constants
 
 const toWei = ethers.utils.parseEther
@@ -11,7 +13,7 @@ const toWei = ethers.utils.parseEther
 const debug = require('debug')('ptv3:VolumeDripManagerExposed.test')
 const SENTINAL = '0x0000000000000000000000000000000000000001'
 
-let overrides = { gasLimit: 9500000 }
+let overrides = { gasLimit }
 
 describe('VolumeDripManagerExposed', function() {
 
@@ -25,15 +27,15 @@ describe('VolumeDripManagerExposed', function() {
   let dripAmount = toWei('10')
 
   beforeEach(async () => {
-    [wallet, wallet2, wallet3, wallet4] = await hardhat.ethers.getSigners()
+    [wallet, wallet2, wallet3, wallet4] = await ethers.getSigners()
 
-    const VolumeDripManagerExposed = await hre.ethers.getContractFactory("VolumeDripManagerExposed", wallet, overrides)
+    const VolumeDripManagerExposed = await ethers.getContractFactory("VolumeDripManagerExposed", wallet, overrides)
   
     manager = await VolumeDripManagerExposed.deploy()
 
     debug({ manager: manager.address })
 
-    const IERC20 = await hre.ethers.getContractFactory("ERC20Mintable", wallet, overrides)
+    const IERC20 = await ethers.getContractFactory("ERC20Mintable", wallet, overrides)
 
     measure = await IERC20.deploy('Measure Token', 'MTKN')
     drip1 = await IERC20.deploy('Drip Token 1', 'DRIP1')

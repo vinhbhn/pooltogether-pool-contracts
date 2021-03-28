@@ -1,4 +1,4 @@
-const ethers = require('ethers')
+const { ethers } = require('../../js/ethers.provider')
 const debug = require('debug')('ptv3:signPermit.js')
 
 const domainSchema = [

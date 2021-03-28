@@ -1,6 +1,5 @@
-const hardhat = require("hardhat");
-
-
+const hre = require("hardhat");
+const { ethers } = require('../js/ethers.provider') 
 
 const DEPLOY = {
   BALANCE_DRIPS: true,
@@ -25,7 +24,9 @@ const getChainName = (chainId) => {
     case 3: return 'ropsten';
     case 4: return 'rinkeby';
     case 5: return 'goerli';
+    case 10: return 'mainnet-optimism';
     case 42: return 'kovan';
+    case 420: return 'goerli-optimism';
     case 31337: return 'HardhatEVM';
     default: return 'unknown';
   }
@@ -48,12 +49,12 @@ const MultipleWinners = await hre.artifacts.readArtifact("MultipleWinners")
   console.log("PoolTogether Pool Contracts - Drip Tokens Script")
   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
 
-  const { getNamedAccounts, deployments, getChainId, ethers } = hardhat
+  const { getNamedAccounts, deployments, getChainId } = hre
   const { deploy } = deployments
   const toWei = ethers.utils.parseEther
 
   const { deployer } = await getNamedAccounts()
-  const signer = await ethers.provider.getSigner(deployer)
+  const signer = ethers.provider.getSigner(deployer)
   console.log(`Using deployer address: ${deployer}\n`)
 
   const chainId = parseInt(await getChainId(), 10)

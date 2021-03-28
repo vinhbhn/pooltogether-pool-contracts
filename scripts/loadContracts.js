@@ -1,3 +1,6 @@
+const { ethers } = require('../js/ethers.provider')
+const { deployments } = require('hardhat')
+
 const remapping = {
   'Dai': 'ERC20Mintable',
   'cDai': 'CTokenMock',
@@ -5,7 +8,6 @@ const remapping = {
 }
 
 module.exports = async function () {
-
   const d = await deployments.all()
   const signers = await ethers.getSigners()
 

@@ -1,26 +1,27 @@
 const { expect } = require("chai");
-const hardhat = require('hardhat')
+const hre = require('hardhat')
+const { ethers, gasLimit } = require('../js/ethers.provider')
 
-const { deployMockContract } = require('ethereum-waffle')
-const { AddressZero } = require("ethers").constants
+// const { deployMockContract } = require('ethereum-waffle')
+const { deployMockContract } = hre.waffle
+const { AddressZero } = ethers.constants
 const { call } = require('./helpers/call')
 
 const toWei = ethers.utils.parseEther
 
-const overrides = { gasLimit: 9500000 }
+const overrides = { gasLimit }
 
 const debug = require('debug')('ptv3:Comptroller.test')
 
 const SENTINEL = '0x0000000000000000000000000000000000000001'
 
 async function getLastEvent(contract, tx) {
-  let receipt = await hardhat.ethers.provider.getTransactionReceipt(tx.hash)
+  let receipt = await ethers.provider.getTransactionReceipt(tx.hash)
   let lastLog = receipt.logs[receipt.logs.length - 1]
   return contract.interface.parseLog(lastLog)
 }
 
 describe('Comptroller', () => {
-
   let wallet, wallet2
 
   let provider
@@ -29,8 +30,8 @@ describe('Comptroller', () => {
   let prizePoolAddress
 
   beforeEach(async () => {
-    [wallet, wallet2] = await hardhat.ethers.getSigners()
-    provider = hardhat.ethers.provider
+    [wallet, wallet2] = await ethers.getSigners()
+    provider = ethers.provider
 
     // just fake it so that we can call it as if we *were* the prize strategy
     prizePoolAddress = wallet.address
@@ -39,7 +40,7 @@ describe('Comptroller', () => {
     measure = await deployMockContract(wallet, IERC20.abi)
     dripToken = await deployMockContract(wallet, IERC20.abi)
 
-    const ComptrollerHarness =  await hre.ethers.getContractFactory("ComptrollerHarness", wallet, overrides)
+    const ComptrollerHarness = await ethers.getContractFactory("ComptrollerHarness", wallet, overrides)
  
     comptroller = await ComptrollerHarness.deploy()
     comptroller2 = comptroller.connect(wallet2)
@@ -482,7 +483,6 @@ describe('Comptroller', () => {
   })
 
   describe('beforeTokenTransfer()', () => {
-
     it('should do nothing if minting', async () => {
       await comptroller.beforeTokenTransfer(AddressZero, wallet.address, toWei('10'), measure.address)
     })

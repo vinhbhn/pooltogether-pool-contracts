@@ -1,14 +1,16 @@
 const { expect } = require("chai");
 
-const hardhat = require('hardhat')
-const {deployMockContract } = require('ethereum-waffle')
-const { AddressZero } = hardhat.ethers.constants
+const hre = require('hardhat')
+// const {deployMockContract } = require('ethereum-waffle')
+const {deployMockContract } = hre.waffle
+const { ethers, gasLimit } = require('../js/ethers.provider')
+const { AddressZero } = ethers.constants
 
 const { signDaiPermit } = require('./helpers/signDaiPermit.js')
 
 const toWei = ethers.utils.parseEther
 
-const overrides = { gasLimit: 9500000 }
+const overrides = { gasLimit }
 
 describe('PermitAndDepositDai', () => {
 
@@ -50,8 +52,8 @@ describe('PermitAndDepositDai', () => {
   }
 
   beforeEach(async () => {
-    [wallet, wallet2, wallet3] = await hardhat.ethers.getSigners()
-    provider = hardhat.ethers.provider
+    [wallet, wallet2, wallet3] = await ethers.getSigners()
+    provider = ethers.provider
 
     // just fake it so that we can call it as if we *were* the prize strategy
     prizePoolAddress = wallet.address
@@ -59,13 +61,13 @@ describe('PermitAndDepositDai', () => {
     const network = await provider.getNetwork()
     chainId = network.chainId
 
-    const Dai =  await hre.ethers.getContractFactory("Dai", wallet, overrides)
+    const Dai =  await ethers.getContractFactory("Dai", wallet, overrides)
     dai = await Dai.deploy(chainId)
 
     const PrizePoolInterface = await hre.artifacts.readArtifact("PrizePoolInterface")
     prizePool = await deployMockContract(wallet, PrizePoolInterface.abi)
  
-    const PermitAndDepositDai =  await hre.ethers.getContractFactory("PermitAndDepositDai", wallet, overrides)
+    const PermitAndDepositDai =  await ethers.getContractFactory("PermitAndDepositDai", wallet, overrides)
     permitAndDepositDai = await PermitAndDepositDai.deploy()
   })
 

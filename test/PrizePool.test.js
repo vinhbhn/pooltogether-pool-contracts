@@ -1,17 +1,18 @@
-const { deployMockContract } = require('ethereum-waffle')
+// const { deployMockContract } = require('ethereum-waffle')
 
-const { ethers } = require('ethers')
 const { expect } = require('chai')
-const hardhat = require('hardhat')
+const hre = require('hardhat')
+const { deployMockContract } = hre.waffle
+const { ethers, gasLimit } = require('../js/ethers.provider')
 const { call } = require('./helpers/call')
-const { AddressZero } = require('ethers').constants
+const { AddressZero } = ethers.constants
 
 const toWei = ethers.utils.parseEther
 const fromWei = ethers.utils.formatEther
 
 const debug = require('debug')('ptv3:PrizePool.test')
 
-let overrides = { gasLimit: 9500000 }
+let overrides = { gasLimit }
 
 const NFT_TOKEN_ID = 1
 
@@ -30,7 +31,7 @@ describe('PrizePool', function() {
   let ISablier
 
   beforeEach(async () => {
-    [wallet, wallet2] = await hardhat.ethers.getSigners()
+    [wallet, wallet2] = await ethers.getSigners()
     debug(`using wallet ${wallet.address}`)
 
     debug('mocking tokens...')
@@ -63,7 +64,7 @@ describe('PrizePool', function() {
     await reserveRegistry.mock.lookup.returns(reserve.address)
 
     debug('deploying PrizePoolHarness...')
-    const PrizePoolHarness = await hre.ethers.getContractFactory("PrizePoolHarness", wallet, overrides)
+    const PrizePoolHarness = await ethers.getContractFactory("PrizePoolHarness", wallet, overrides)
     prizePool = await PrizePoolHarness.deploy()
 
     const ControlledToken = await hre.artifacts.readArtifact("ControlledToken")
@@ -209,7 +210,7 @@ describe('PrizePool', function() {
         let initArgs
 
         debug('deploying secondary prizePool...')
-        const PrizePoolHarness = await hre.ethers.getContractFactory("PrizePoolHarness", wallet, overrides)
+        const PrizePoolHarness = await ethers.getContractFactory("PrizePoolHarness", wallet, overrides)
         const prizePool2 = await PrizePoolHarness.deploy()
 
         debug('testing initialization of secondary prizeStrategy...')
@@ -813,7 +814,7 @@ describe('PrizePool', function() {
       await multiTokenPrizeStrategy.mock.supportsInterface.withArgs('0xffffffff').returns(false)
 
 
-      const PrizePoolHarness = await hre.ethers.getContractFactory("PrizePoolHarness", wallet, overrides)
+      const PrizePoolHarness = await ethers.getContractFactory("PrizePoolHarness", wallet, overrides)
       multiTokenPrizePool = await PrizePoolHarness.deploy()
 
       const ControlledToken = await hre.artifacts.readArtifact("ControlledToken")

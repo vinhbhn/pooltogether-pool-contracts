@@ -1,7 +1,7 @@
 const { deployments } = require("hardhat");
 const { expect } = require('chai')
-const hardhat = require('hardhat')
-const { ethers } = require('ethers')
+const { ethers } = require('../js/ethers.provider')
+
 const { AddressZero } = ethers.constants
 const { getEvents } = require('./helpers/getEvents')
 
@@ -22,11 +22,11 @@ describe('PoolWithMultipleWinnersBuilder', () => {
   let multipleWinnersConfig
 
   beforeEach(async () => {
-    [wallet] = await hardhat.ethers.getSigners()
+    [wallet] = await ethers.getSigners()
 
     await deployments.fixture()
     
-    builder = await hardhat.ethers.getContractAt(
+    builder = await ethers.getContractAt(
       "PoolWithMultipleWinnersBuilder",
       (await deployments.get("PoolWithMultipleWinnersBuilder")).address,
       wallet
@@ -93,8 +93,8 @@ describe('PoolWithMultipleWinnersBuilder', () => {
 
       debug(`Creating prize pool using address: ${prizePoolCreatedEvent.args.prizePool}...`)
 
-      const prizePool = await hardhat.ethers.getContractAt('CompoundPrizePoolHarness', prizePoolCreatedEvent.args.prizePool, wallet)
-      const prizeStrategy = await hardhat.ethers.getContractAt('MultipleWinners', prizePoolCreatedEvent.args.prizeStrategy, wallet)
+      const prizePool = await ethers.getContractAt('CompoundPrizePoolHarness', prizePoolCreatedEvent.args.prizePool, wallet)
+      const prizeStrategy = await ethers.getContractAt('MultipleWinners', prizePoolCreatedEvent.args.prizeStrategy, wallet)
 
       expect(await prizePool.prizeStrategy()).to.equal(prizeStrategy.address)
       expect(await prizePool.owner()).to.equal(wallet.address)
@@ -141,8 +141,8 @@ describe('PoolWithMultipleWinnersBuilder', () => {
 
       debug(`Creating prize pool using address: ${prizePoolCreatedEvent.args.prizePool}...`)
 
-      const prizePool = await hardhat.ethers.getContractAt('StakePrizePool', prizePoolCreatedEvent.args.prizePool, wallet)
-      const prizeStrategy = await hardhat.ethers.getContractAt('MultipleWinners', prizePoolCreatedEvent.args.prizeStrategy, wallet)
+      const prizePool = await ethers.getContractAt('StakePrizePool', prizePoolCreatedEvent.args.prizePool, wallet)
+      const prizeStrategy = await ethers.getContractAt('MultipleWinners', prizePoolCreatedEvent.args.prizeStrategy, wallet)
 
       expect(await prizePool.prizeStrategy()).to.equal(prizeStrategy.address)
       expect(await prizePool.owner()).to.equal(wallet.address)
@@ -182,8 +182,8 @@ describe('PoolWithMultipleWinnersBuilder', () => {
 
       debug(`Creating prize pool using address: ${prizePoolCreatedEvent.args.prizePool}...`)
 
-      const prizePool = await hardhat.ethers.getContractAt('YieldSourcePrizePool', prizePoolCreatedEvent.args.prizePool, wallet)
-      const prizeStrategy = await hardhat.ethers.getContractAt('MultipleWinners', prizePoolCreatedEvent.args.prizeStrategy, wallet)
+      const prizePool = await ethers.getContractAt('YieldSourcePrizePool', prizePoolCreatedEvent.args.prizePool, wallet)
+      const prizeStrategy = await ethers.getContractAt('MultipleWinners', prizePoolCreatedEvent.args.prizeStrategy, wallet)
 
       expect(await prizePool.yieldSource()).to.equal(cDaiYieldSource.address)
       expect(await prizePool.token()).to.equal(dai.address)

@@ -1,13 +1,15 @@
-const { deployMockContract } = require('ethereum-waffle')
+// const { deployMockContract } = require('ethereum-waffle')
 const { expect } = require('chai')
 const hre = require('hardhat')
+const { deployMockContract } = hre.waffle
+const { ethers, gasLimit } = require('../js/ethers.provider')
 const { AddressZero } = require('ethers').constants
 
 const toWei = (val) => ethers.utils.parseEther('' + val)
 
 const debug = require('debug')('ptv3:SablierManager.test')
 
-let overrides = { gasLimit: 9500000 }
+let overrides = { gasLimit }
 
 describe('SablierManager', () => {
   let wallet, wallet2
@@ -17,7 +19,7 @@ describe('SablierManager', () => {
   let IERC20, ISablier, OwnableUpgradeable, PeriodicPrizeStrategy
 
   beforeEach(async () => {
-    [wallet, wallet2] = await hre.ethers.getSigners()
+    [wallet, wallet2] = await ethers.getSigners()
 
     IERC20 = await hre.artifacts.readArtifact("IERC20Upgradeable")
     ISablier = await hre.artifacts.readArtifact("ISablier")
@@ -29,7 +31,7 @@ describe('SablierManager', () => {
     await prizePool.mock.owner.returns(wallet.address)
     sablier = await deployMockContract(wallet, ISablier.abi, overrides)
 
-    const SablierManagerHarness =  await hre.ethers.getContractFactory("SablierManagerHarness", wallet, overrides)
+    const SablierManagerHarness =  await ethers.getContractFactory("SablierManagerHarness", wallet, overrides)
     sablierManager = await SablierManagerHarness.deploy(sablier.address)
   })
 

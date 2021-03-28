@@ -1,13 +1,13 @@
-const { deployMockContract } = require('ethereum-waffle')
-const { ethers } = require('ethers')
+// const { deployMockContract } = require('ethereum-waffle')
 const { expect } = require('chai')
-const hardhat = require('hardhat')
-
+const hre = require('hardhat')
+const { deployMockContract } = hre.waffle
+const { ethers, gasLimit } = require('../js/ethers.provider')
 const toWei = ethers.utils.parseEther
 
 const debug = require('debug')('ptv3:YieldSourcePrizePool.test')
 
-let overrides = { gasLimit: 9500000 }
+let overrides = { gasLimit }
 
 describe('YieldSourcePrizePool', function() {
   let wallet, wallet2
@@ -22,16 +22,16 @@ describe('YieldSourcePrizePool', function() {
   let initializeTxPromise
 
   beforeEach(async () => {
-    [wallet, wallet2] = await hardhat.ethers.getSigners()
+    [wallet, wallet2] = await ethers.getSigners()
     debug(`using wallet ${wallet.address}`)
 
     debug('creating token...')
-    const ERC20MintableContract =  await hre.ethers.getContractFactory("ERC20Mintable", wallet, overrides)
+    const ERC20MintableContract = await ethers.getContractFactory("ERC20Mintable", wallet, overrides)
     erc20token = await ERC20MintableContract.deploy("Token", "TOKE")
 
     debug('creating yield source mock...')
     const IYieldSource = await hre.artifacts.readArtifact("IYieldSource")
-    yieldSource =  await deployMockContract(wallet, IYieldSource.abi, overrides)
+    yieldSource = await deployMockContract(wallet, IYieldSource.abi, overrides)
     yieldSource.mock.depositToken.returns(erc20token.address)
 
     const TokenListenerInterface = await hre.artifacts.readArtifact("TokenListenerInterface")
@@ -43,7 +43,7 @@ describe('YieldSourcePrizePool', function() {
     reserveRegistry = await deployMockContract(wallet, RegistryInterface.abi, overrides)
 
     debug('deploying YieldSourcePrizePoolHarness...')
-    const YieldSourcePrizePoolHarness =  await hre.ethers.getContractFactory("YieldSourcePrizePoolHarness", wallet, overrides)
+    const YieldSourcePrizePoolHarness =  await ethers.getContractFactory("YieldSourcePrizePoolHarness", wallet, overrides)
     prizePool = await YieldSourcePrizePoolHarness.deploy()
 
     const ControlledToken = await hre.artifacts.readArtifact("ControlledToken")

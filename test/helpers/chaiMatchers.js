@@ -1,4 +1,4 @@
-const ethers = require('ethers')
+const { ethers } = require('../../js/ethers.provider')
 const { Assertion } = require('chai')
 
 Assertion.addMethod('equalish', function (value, difference = 10) {
@@ -19,7 +19,7 @@ Assertion.addMethod('equalish', function (value, difference = 10) {
       delta.lte(difference)
     , `expected ${obj.toString()} to be within ${difference} of #{exp} but got #{act}`
     , `expected ${obj.toString()} to not be within #{act}`
-    , value.toString()        // expected
+    , value.toString() // expected
     , obj.toString()   // actual
   );
 });

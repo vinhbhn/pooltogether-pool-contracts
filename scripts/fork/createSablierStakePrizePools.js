@@ -1,4 +1,5 @@
 const hardhat = require('hardhat')
+const { ethers } = require('../../js/ethers.provider')
 const chalk = require("chalk")
 const { increaseTime } = require('../../test/helpers/increaseTime')
 
@@ -10,7 +11,7 @@ function green() {
   console.log(chalk.green.call(chalk, ...arguments))
 }
 
-const { ethers, deployments, getNamedAccounts } = hardhat
+const { deployments, getNamedAccounts } = hardhat
 
 async function getStakePrizePoolProxy(tx) { 
   const stakePrizePoolProxyFactory = await ethers.getContract('StakePrizePoolProxyFactory')
@@ -20,7 +21,7 @@ async function getStakePrizePoolProxy(tx) {
 }
 
 async function run() {
-  const operationsSafe = await ethers.provider.getUncheckedSigner('0x029Aa20Dcc15c022b1b61D420aaCf7f179A9C73f')
+  const operationsSafe = ethers.provider.getUncheckedSigner('0x029Aa20Dcc15c022b1b61D420aaCf7f179A9C73f')
   const dai = await ethers.getContractAt('Dai', '0x6b175474e89094c44da98b954eedeac495271d0f', operationsSafe)
   const builder = await ethers.getContract('PoolWithMultipleWinnersBuilder', operationsSafe)
 
@@ -94,7 +95,6 @@ async function run() {
   const awarded = awardLogs.find(event => event && event.name === 'Awarded')
 
   console.log(`Awarded ${ethers.utils.formatEther(awarded.args.amount)} Dai`)
-
 }
 
 run()

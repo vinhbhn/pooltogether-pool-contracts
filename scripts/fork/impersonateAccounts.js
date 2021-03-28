@@ -1,12 +1,11 @@
 const hre = require("hardhat")
 
-
 async function run(){
     const { getNamedAccounts } = hre
     const { deployer } = await getNamedAccounts()
 
     console.log("Impersonating accounts")
-    await hre.ethers.provider.send("hardhat_impersonateAccount", ["0x0000000000000000000000000000000000000000"])
+    await hre.ethers.provider.send("hardhat_impersonateAccount",["0x0000000000000000000000000000000000000000"])
     await hre.ethers.provider.send("hardhat_impersonateAccount",["0x00929c5c2c4f00b540e429247669eb6fcd8b1dbf"])
     await hre.ethers.provider.send("hardhat_impersonateAccount",["0x029Aa20Dcc15c022b1b61D420aaCf7f179A9C73f"])
     await hre.ethers.provider.send("hardhat_impersonateAccount",["0x121b9c8c140fa8fe697cc96d156a38d865fa4868"])
@@ -55,6 +54,6 @@ async function run(){
     await hre.ethers.provider.send("hardhat_impersonateAccount",["0xf53a69e7b19d3a92ceae7efb9c621d01d5ab365a"])
     await hre.ethers.provider.send("hardhat_impersonateAccount",["0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8"])
     await hre.ethers.provider.send("hardhat_impersonateAccount",["0xf977814e90da44bfa03b6295a0616a897441acec"])
-console.log("finished impersonating accounts")
+    console.log("finished impersonating accounts")
 }
 run()

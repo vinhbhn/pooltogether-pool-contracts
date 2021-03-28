@@ -1,14 +1,16 @@
-const { deployMockContract } = require('ethereum-waffle')
+// const { deployMockContract } = require('ethereum-waffle')
 const { deploy1820 } = require('deploy-eip-1820')
 
 const { expect } = require('chai')
-const hardhat = require('hardhat')
+const hre = require('hardhat')
+const { deployMockContract } = hre.waffle
+const { ethers, gasLimit } = require('../js/ethers.provider')
 
 const now = () => (new Date()).getTime() / 1000 | 0
 const toWei = (val) => ethers.utils.parseEther('' + val)
 const debug = require('debug')('ptv3:PeriodicPrizePool.test')
 
-let overrides = { gasLimit: 9500000 }
+let overrides = { gasLimit }
 
 describe('SingleRandomWinner', function() {
   let wallet, wallet2
@@ -25,7 +27,7 @@ describe('SingleRandomWinner', function() {
   let creditLimitMantissa = 0.1
 
   beforeEach(async () => {
-    [wallet, wallet2, wallet3] = await hardhat.ethers.getSigners()
+    [wallet, wallet2, wallet3] = await ethers.getSigners()
 
     debug(`using wallet ${wallet.address}`)
 
@@ -66,7 +68,7 @@ describe('SingleRandomWinner', function() {
 
     debug('deploying prizeStrategy...')
 
-    const SingleRandomWinnerHarness =  await hre.ethers.getContractFactory("SingleRandomWinnerHarness", wallet, overrides)
+    const SingleRandomWinnerHarness =  await ethers.getContractFactory("SingleRandomWinnerHarness", wallet, overrides)
     prizeStrategy = await SingleRandomWinnerHarness.deploy()
 
     await prizePool.mock.canAwardExternal.withArgs(externalERC20Award.address).returns(true)

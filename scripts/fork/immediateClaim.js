@@ -1,4 +1,5 @@
 const hardhat = require('hardhat')
+const { ethers } = require('../../js/ethers.provider')
 const chalk = require("chalk")
 const { increaseTime } = require('../../test/helpers/increaseTime')
 
@@ -10,7 +11,7 @@ function green() {
   console.log(chalk.green.call(chalk, ...arguments))
 }
 
-const { ethers, deployments, getNamedAccounts } = hardhat
+const { deployments, getNamedAccounts } = hardhat
 
 async function getStakePrizePoolProxy(tx) { 
   const stakePrizePoolProxyFactory = await ethers.getContract('StakePrizePoolProxyFactory')
@@ -20,8 +21,8 @@ async function getStakePrizePoolProxy(tx) {
 }
 
 async function run() {
-  const operationsSafe = await ethers.provider.getUncheckedSigner('0x029Aa20Dcc15c022b1b61D420aaCf7f179A9C73f')
-  const daiRichSigner = await ethers.provider.getUncheckedSigner('0xF977814e90dA44bFA03b6295A0616a897441aceC')
+  const operationsSafe = ethers.provider.getUncheckedSigner('0x029Aa20Dcc15c022b1b61D420aaCf7f179A9C73f')
+  const daiRichSigner = ethers.provider.getUncheckedSigner('0xF977814e90dA44bFA03b6295A0616a897441aceC')
   const daiTicket = await ethers.getContractAt('Ticket', '0x334cbb5858417aee161b53ee0d5349ccf54514cf', operationsSafe)
   const dai = await ethers.getContractAt('Dai', '0x6b175474e89094c44da98b954eedeac495271d0f', operationsSafe)
   const daiPrizePool = await ethers.getContractAt('CompoundPrizePool', '0xEBfb47A7ad0FD6e57323C8A42B2E5A6a4F68fc1a', operationsSafe)

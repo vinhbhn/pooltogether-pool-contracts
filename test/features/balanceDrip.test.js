@@ -1,5 +1,5 @@
 const { PoolEnv } = require('./support/PoolEnv')
-const ethers = require('ethers')
+const { ethers } = require('../../js/ethers.provider')
 
 const toWei = (val) => ethers.utils.parseEther('' + val)
 

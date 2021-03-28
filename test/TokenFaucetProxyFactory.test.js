@@ -1,16 +1,17 @@
 const { expect } = require("chai");
-const hardhat = require('hardhat')
-const {  deployMockContract } = require('ethereum-waffle')
+const hre = require('hardhat')
+const { ethers, gasLimit } = require('../js/ethers.provider')
+// const {  deployMockContract } = require('ethereum-waffle')
+const {  deployMockContract } = hre.waffle
 const { deployments } = require("hardhat")
 
-const toWei = hardhat.ethers.utils.parseEther
+const toWei = ethers.utils.parseEther
 
 const debug = require('debug')('ptv3:TokenFaucetProxyFactory.test')
 
-let overrides = { gasLimit: 9500000 }
+let overrides = { gasLimit }
 
 describe('TokenFaucetProxyFactory', () => {
-
   let wallet, wallet2
 
   let provider
@@ -18,18 +19,18 @@ describe('TokenFaucetProxyFactory', () => {
   let tokenFaucetProxyFactory, measure, asset
 
   beforeEach(async () => {
-    [wallet, wallet2] = await hardhat.ethers.getSigners()
+    [wallet, wallet2] = await ethers.getSigners()
 
     await deployments.fixture()
     
-    provider = hardhat.ethers.provider
+    provider = ethers.provider
     
-    const ERC20MintableContract =  await hardhat.ethers.getContractFactory("ERC20Mintable", wallet, overrides)
+    const ERC20MintableContract = await ethers.getContractFactory("ERC20Mintable", wallet, overrides)
     
     measure = await ERC20MintableContract.deploy('Measure', 'MEAS')
     asset = await ERC20MintableContract.deploy('Asset', 'ASS')
     
-    tokenFaucetProxyFactory = await hardhat.ethers.getContract('TokenFaucetProxyFactory', wallet)
+    tokenFaucetProxyFactory = await ethers.getContract('TokenFaucetProxyFactory', wallet)
   })
 
   describe('create()', () => {
@@ -39,7 +40,7 @@ describe('TokenFaucetProxyFactory', () => {
       let event = tokenFaucetProxyFactory.interface.parseLog(receipt.logs[0])
       expect(event.name).to.equal('ProxyCreated')
 
-      let tokenFaucet = await hardhat.ethers.getContractAt("TokenFaucet", event.args.proxy, wallet)
+      let tokenFaucet = await ethers.getContractAt("TokenFaucet", event.args.proxy, wallet)
 
       expect(await tokenFaucet.asset()).to.equal(asset.address)
       expect(await tokenFaucet.measure()).to.equal(measure.address)
@@ -64,7 +65,7 @@ describe('TokenFaucetProxyFactory', () => {
       expect(event.name).to.equal('ProxyCreated')
 
       debug(`createAndDeposit() get TokenFaucet contract...`)
-      let tokenFaucet = await hardhat.ethers.getContractAt("TokenFaucet", event.args.proxy, wallet)
+      let tokenFaucet = await ethers.getContractAt("TokenFaucet", event.args.proxy, wallet)
 
       expect(await asset.balanceOf(tokenFaucet.address)).to.equal(toWei('100'))
     })

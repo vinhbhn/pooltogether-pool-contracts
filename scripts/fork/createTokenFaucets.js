@@ -1,4 +1,5 @@
 const hardhat = require('hardhat')
+const { ethers } = require('../../js/ethers.provider')
 const chalk = require("chalk")
 
 function dim() {
@@ -9,11 +10,11 @@ function green() {
   console.log(chalk.green.call(chalk, ...arguments))
 }
 
-const { ethers, deployments, getNamedAccounts } = hardhat
+const { deployments, getNamedAccounts } = hardhat
 
 async function getProxy(tx) { 
   const tokenFaucetProxyFactoryDeployment = await deployments.get('TokenFaucetProxyFactory')
-  const gnosisSafe = await ethers.provider.getUncheckedSigner('0x029Aa20Dcc15c022b1b61D420aaCf7f179A9C73f')
+  const gnosisSafe = ethers.provider.getUncheckedSigner('0x029Aa20Dcc15c022b1b61D420aaCf7f179A9C73f')
   const tokenFaucetProxyFactory = await ethers.getContractAt('TokenFaucetProxyFactory', tokenFaucetProxyFactoryDeployment.address, gnosisSafe)
   const createResultReceipt = await ethers.provider.getTransactionReceipt(tx.hash)
   const createResultEvents = createResultReceipt.logs.map(log => { try { return tokenFaucetProxyFactory.interface.parseLog(log) } catch (e) { return null } })
@@ -24,8 +25,8 @@ async function run() {
   const { pool } = await getNamedAccounts()
 
   const tokenFaucetProxyFactoryDeployment = await deployments.get('TokenFaucetProxyFactory')
-  const treasurySafe = await ethers.provider.getUncheckedSigner('0x77383BaDb05049806d53e9def0C8128de0D56D90')
-  const gnosisSafe = await ethers.provider.getUncheckedSigner('0x029Aa20Dcc15c022b1b61D420aaCf7f179A9C73f')
+  const treasurySafe = ethers.provider.getUncheckedSigner('0x77383BaDb05049806d53e9def0C8128de0D56D90')
+  const gnosisSafe = ethers.provider.getUncheckedSigner('0x029Aa20Dcc15c022b1b61D420aaCf7f179A9C73f')
   const tokenFaucetProxyFactory = await ethers.getContractAt('TokenFaucetProxyFactory', tokenFaucetProxyFactoryDeployment.address, gnosisSafe)
   
   const poolToken = await ethers.getContractAt('IERC20Upgradeable', pool, treasurySafe)
@@ -67,7 +68,6 @@ async function run() {
   await compPrizeStrategy.setTokenListener(compTokenFaucet)
   green(`Created comp TokenFaucet at ${compTokenFaucet}!`)
   await poolToken.transfer(compTokenFaucet, compDripAmount)
-
 }
 
 run()

@@ -1,5 +1,7 @@
 const { deploy1820 } = require('deploy-eip-1820')
 const chalk = require('chalk')
+const { ethers } = require('../js/ethers.provider')
+const hardhat = require('hardhat')
 
 function dim() {
   if (!process.env.HIDE_DEPLOY_LOG) {
@@ -39,19 +41,22 @@ const chainName = (chainId) => {
     case 3: return 'Ropsten';
     case 4: return 'Rinkeby';
     case 5: return 'Goerli';
+    case 10: return 'Optimism Mainnet';
     case 42: return 'Kovan';
+    case 69: return 'Optimism Kovan';
     case 77: return 'POA Sokol';
     case 99: return 'POA';
     case 100: return 'xDai';
     case 137: return 'Matic';
+    case 420: return 'Optimism Goerli';
     case 31337: return 'HardhatEVM';
     case 80001: return 'Matic (Mumbai)';
     default: return 'Unknown';
   }
 }
 
-module.exports = async (hardhat) => {
-  const { getNamedAccounts, deployments, getChainId, ethers } = hardhat
+module.exports = async () => {
+  const { getNamedAccounts, deployments, getChainId } = hardhat
   const { deploy } = deployments
 
   const harnessDisabled = !!process.env.DISABLE_HARNESS
@@ -69,7 +74,7 @@ module.exports = async (hardhat) => {
   // 31337 is unit testing, 1337 is for coverage
   const isTestEnvironment = chainId === 31337 || chainId === 1337
 
-  const signer = await ethers.provider.getSigner(deployer)
+  const signer = ethers.provider.getSigner(deployer)
 
   dim("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
   dim("PoolTogether Pool Contracts - Deploy Script")
@@ -157,7 +162,7 @@ module.exports = async (hardhat) => {
       skipIfAlreadyDeployed: true
     })
     comptrollerAddress = comptrollerResult.address
-    const comptrollerContract = await hardhat.ethers.getContractAt(
+    const comptrollerContract = await ethers.getContractAt(
       "Comptroller",
       comptrollerResult.address,
       signer
@@ -185,7 +190,7 @@ module.exports = async (hardhat) => {
     })
     displayResult('Reserve', reserveResult)
 
-    const reserveContract = await hardhat.ethers.getContractAt(
+    const reserveContract = await ethers.getContractAt(
       "Reserve",
       reserveResult.address,
       signer
@@ -202,7 +207,7 @@ module.exports = async (hardhat) => {
     })
     displayResult('ReserveRegistry', reserveRegistryResult)
 
-    const reserveRegistryContract = await hardhat.ethers.getContractAt(
+    const reserveRegistryContract = await ethers.getContractAt(
       "Registry",
       reserveRegistryResult.address,
       signer
